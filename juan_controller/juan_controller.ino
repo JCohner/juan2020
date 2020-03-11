@@ -1,5 +1,5 @@
 #include <ServoESP32.h>
-#include <PS4Controller.h>
+#include <FR.h>
 
 static const int MRPin = A0; // Right motor PWM (speed)
 static const int MLPin = A1; // Left motor PWM (speed)
@@ -12,6 +12,15 @@ Servo drumMotor;
 int stop = 1500;
 int l = 1500;
 int r = 1500;
+
+void controllerConnect() {
+  Serial.println("Connected!.");
+  PS4.setLed(255,255,255); 
+}
+
+void disconnect() {
+  Serial.print("BYE");
+}
 
 void receivePacket() { 
 
@@ -34,19 +43,6 @@ void receivePacket() {
   drum_mapped = map(drum_bm,0,255,1500,2000);                                    
 
 
-  /*if(PS4.event.button_down.up){
-    l++;
-  }
-  if(PS4.event.button_down.down){
-    l--;
-  }
-  if(PS4.event.button_down.triangle){
-    r++;
-  }
-  if(PS4.event.button_down.cross){
-    r--;
-  }*/
-
   //if(L_mapped < 1525 && L_mapped > 1475) L_mapped = stop;
   //if(R_mapped < 1520 && R_mapped > 1480) R_mapped = stop;
  
@@ -54,33 +50,24 @@ void receivePacket() {
   rightMotor.writeMicroseconds(R_mapped);
   drumMotor.writeMicroseconds(drum_mapped);
 
-  
-    
-    
-    
-    Serial.print("r2 button at ");
-    Serial.println(drum_mapped);
-
 }
 
-void controllerConnect() {
-  Serial.println("Connected!.");
-  PS4.setLed(255,255,255); 
-}
+
 
 void setup() {
   Serial.begin(115200);
   rightMotor.attach(MRPin);
   leftMotor.attach(MLPin);
   drumMotor.attach(DPin);
-  //PS4.attach(receivePacket);
+  //safetySetup(disconnect,ps4);
   PS4.attachOnConnect(controllerConnect);
   PS4.begin("01:02:03:04:05:67");
+  
 }
 
 void loop() {
+  //safetyLoop();
   if(PS4.isConnected()){
-    
     receivePacket();
   }
 }
