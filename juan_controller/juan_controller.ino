@@ -1,5 +1,6 @@
-#include <ServoESP32.h>
 #include <FR.h>
+#include <ServoESP32.h>
+
 
 static const int MRPin = A0; // Right motor PWM (speed)
 static const int MLPin = A1; // Left motor PWM (speed)
@@ -14,11 +15,15 @@ int l = 1500;
 int r = 1500;
 
 void controllerConnect() {
+
   Serial.println("Connected!.");
   PS4.setLed(255,255,255); 
 }
 
 void disconnect() {
+  rightMotor.detach();
+  leftMotor.detach();
+  drumMotor.detach();
   Serial.print("BYE");
 }
 
@@ -52,21 +57,19 @@ void receivePacket() {
 
 }
 
-
-
 void setup() {
   Serial.begin(115200);
   rightMotor.attach(MRPin);
   leftMotor.attach(MLPin);
   drumMotor.attach(DPin);
-  //safetySetup(disconnect,ps4);
+  safetySetup(disconnect,ps4);
   PS4.attachOnConnect(controllerConnect);
-  PS4.begin("01:02:03:04:05:67");
+  PS4.begin("03:03:03:03:03:03");
   
 }
 
 void loop() {
-  //safetyLoop();
+  safetyLoop();
   if(PS4.isConnected()){
     receivePacket();
   }
